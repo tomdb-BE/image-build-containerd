@@ -3,6 +3,7 @@ ARG GO_IMAGE
 FROM ${UBI_IMAGE} as ubi
 FROM ${GO_IMAGE} as builder
 ARG PROTOC_VERSION=1.17.3
+ARG ARCH=amd64
 # setup required packages
 RUN set -x \
  && apk --no-cache add \

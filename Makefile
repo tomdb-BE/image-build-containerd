@@ -31,6 +31,7 @@ image-build:
                 --build-arg PROTOC_VERSION=$(PROTOC_VERSION) \
                 --build-arg GO_IMAGE=$(ORG)/hardened-build-base:$(GOLANG_VERSION) \
                 --build-arg UBI_IMAGE=$(UBI_IMAGE) \
+                --build-arg ARCH=$(ARCH) \
 		--tag $(ORG)/hardened-containerd:$(TAG) \
 		--tag $(ORG)/hardened-containerd:$(TAG)-$(ARCH) \
 	.
