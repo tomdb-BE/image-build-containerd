@@ -1,7 +1,8 @@
-ARG UBI_IMAGE=registry.access.redhat.com/ubi7/ubi-minimal:latest
-ARG GO_IMAGE=rancher/hardened-build-base:v1.15.14b5
+ARG UBI_IMAGE
+ARG GO_IMAGE
 FROM ${UBI_IMAGE} as ubi
 FROM ${GO_IMAGE} as builder
+ARG PROTOC_VERSION=1.17.3
 # setup required packages
 RUN set -x \
  && apk --no-cache add \
@@ -17,8 +18,8 @@ RUN set -x \
     mercurial \
     subversion \
     unzip
-ADD https://github.com/google/protobuf/releases/download/v3.17.3/protoc-3.17.3-linux-x86_64.zip .
-RUN unzip protoc-3.17.3-linux-x86_64.zip -d /usr
+RUN archurl=x86_64; if [[ "$ARCH" == "arm64" ]]; then archurl=aarch_64; fi; wget https://github.com/google/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-$archurl.zip
+RUN archurl=x86_64; if [[ "$ARCH" == "arm64" ]]; then archurl=aarch_64; fi; unzip protoc-${PROTOC_VERSION}-linux-$archurl.zip -d /usr
 # setup containerd build
 ARG SRC="github.com/k3s-io/containerd"
 ARG PKG="github.com/containerd/containerd"
@@ -49,6 +50,6 @@ RUN install -s bin/* /usr/local/bin
 RUN containerd --version
 
 FROM ubi
-RUN microdnf update -y && \
+RUN yum update -y && \
     rm -rf /var/cache/yum
 COPY --from=builder /usr/local/bin/ /usr/local/bin/
