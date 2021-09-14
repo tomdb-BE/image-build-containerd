@@ -4,7 +4,7 @@ ifeq ($(ARCH),)
 ARCH=$(shell go env GOARCH)
 endif
 
-BUILD_META=-multiarch-build$(shell date +%Y%m%d)
+BUILD_META ?= -multiarch-build$(shell date +%Y%m%d)
 ORG ?= rancher
 PKG ?= github.com/containerd/containerd
 SRC ?= github.com/k3s-io/containerd
