@@ -8,10 +8,9 @@ BUILD_META ?= -multiarch-build$(shell date +%Y%m%d)
 ORG ?= rancher
 PKG ?= github.com/containerd/containerd
 SRC ?= github.com/k3s-io/containerd
-TAG ?= v1.5.5-k3s1$(BUILD_META)
+TAG ?= v1.5.7-k3s1$(BUILD_META)
 UBI_IMAGE ?= centos:7
-GOLANG_VERSION ?= v1.16.6b7-multiarch
-
+GOLANG_VERSION ?= v1.16.7b7-multiarch
 PROTOC_VERSION ?= 3.17.3
 
 ifneq ($(DRONE_TAG),)
