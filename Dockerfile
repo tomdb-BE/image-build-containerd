@@ -22,7 +22,7 @@ RUN set -x \
 RUN if [ "${ARCH}" == "s390x" ]; then \
         curl -LO https://github.com/google/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-s390_64.zip; \
         unzip protoc-${PROTOC_VERSION}-linux-s390_64.zip -d /usr; \
-    if [ "${ARCH}" == "s390x" ]; then \
+    elif [ "${ARCH}" == "s390x" ]; then \
         curl -LO https://github.com/google/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-aarch_64.zip; \
         unzip protoc-${PROTOC_VERSION}-linux-aarch_64.zip -d /usr; \
     else \
