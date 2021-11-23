@@ -2,7 +2,7 @@ ARG UBI_IMAGE
 ARG GO_IMAGE
 FROM ${UBI_IMAGE} as ubi
 FROM ${GO_IMAGE} as builder
-ARG PROTOC_VERSION=1.17.3
+ARG PROTOC_VERSION=3.17.3
 ARG ARCH=amd64
 # setup required packages
 RUN set -x \
@@ -19,8 +19,16 @@ RUN set -x \
     mercurial \
     subversion \
     unzip
-RUN archurl=x86_64; if [[ "$ARCH" == "arm64" ]]; then archurl=aarch_64; fi; wget https://github.com/google/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-$archurl.zip
-RUN archurl=x86_64; if [[ "$ARCH" == "arm64" ]]; then archurl=aarch_64; fi; unzip protoc-${PROTOC_VERSION}-linux-$archurl.zip -d /usr
+RUN if [ "${ARCH}" == "s390x" ]; then \
+        curl -LO https://github.com/google/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-s390_64.zip; \
+        unzip protoc-${PROTOC_VERSION}-linux-s390_64.zip -d /usr; \
+    if [ "${ARCH}" == "s390x" ]; then \
+        curl -LO https://github.com/google/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-aarch_64.zip; \
+        unzip protoc-${PROTOC_VERSION}-linux-aarch_64.zip -d /usr; \
+    else \
+        curl -LO https://github.com/google/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-x86_64.zip; \
+        unzip protoc-${PROTOC_VERSION}-linux-x86_64.zip -d /usr; \
+    fi
 # setup containerd build
 ARG SRC="github.com/k3s-io/containerd"
 ARG PKG="github.com/containerd/containerd"
@@ -44,11 +52,15 @@ RUN export GO_LDFLAGS="-linkmode=external \
  && go-build-static.sh ${GO_BUILDFLAGS} -o bin/containerd-shim-runc-v1  ./cmd/containerd-shim-runc-v1 \
  && go-build-static.sh ${GO_BUILDFLAGS} -o bin/containerd-shim-runc-v2  ./cmd/containerd-shim-runc-v2
 RUN go-assert-static.sh bin/*
-RUN go-assert-boring.sh \
-    bin/ctr \
-    bin/containerd
+RUN if [ "${ARCH}" != "s390x" ]; then \
+        go-assert-boring.sh \
+        bin/ctr \
+        bin/containerd; \
+    fi
 RUN install -s bin/* /usr/local/bin
 RUN containerd --version
 
 FROM ubi
+RUN microdnf update -y && \
+    rm -rf /var/cache/yum
 COPY --from=builder /usr/local/bin/ /usr/local/bin/
