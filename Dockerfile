@@ -1,5 +1,6 @@
+ARG ORG=rancher
 ARG BCI_IMAGE=registry.suse.com/bci/bci-base:15.3.17.20.12
-ARG GO_IMAGE=rancher/hardened-build-base:v1.20.3b1
+ARG GO_IMAGE=${ORG}/hardened-build-base:v1.20.3b1
 FROM ${BCI_IMAGE} as bci
 FROM ${GO_IMAGE} as builder
 ARG ARCH="amd64"
@@ -22,6 +23,9 @@ RUN set -x \
 RUN if [ "${ARCH}" == "s390x" ]; then \
         curl -LO https://github.com/google/protobuf/releases/download/v3.17.3/protoc-3.17.3-linux-s390_64.zip; \
         unzip protoc-3.17.3-linux-s390_64.zip -d /usr; \
+    elif [ "${ARCH}" == "arm64" ]; then \
+        curl -LO https://github.com/google/protobuf/releases/download/v3.17.3/protoc-3.17.3-linux-aarch_64.zip; \
+        unzip protoc-3.17.3-linux-aarch_64.zip -d /usr; \
     else \
         curl -LO https://github.com/google/protobuf/releases/download/v3.17.3/protoc-3.17.3-linux-x86_64.zip; \
         unzip protoc-3.17.3-linux-x86_64.zip -d /usr; \

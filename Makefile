@@ -36,6 +36,7 @@ image-build:
 		--build-arg SRC=$(SRC) \
 		--build-arg TAG=$(TAG:$(BUILD_META)=) \
 		--build-arg ARCH=$(ARCH) \
+		--build-arg ORG=$(ORG) \
 		--build-arg GOOS=$(OS) \
 		--tag $(ORG)/hardened-containerd:$(TAG)-$(ARCH)-$(OS) \
 		--file $(DOCKERFILE) \
